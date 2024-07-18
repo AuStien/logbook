@@ -1,0 +1,144 @@
+#define _GNU_SOURCE
+#include <unistd.h>
+#include <stdlib.h>
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#include <errno.h>
+#include <string.h>
+#include <time.h>
+#include <fcntl.h>
+
+int upsertDir(char *path);
+int upsertFile(char *path);
+void printErr(int err);
+
+int main() {
+  char *path = getenv("LOG_HOME");
+  if (path == NULL) {
+    fprintf(stderr, "missing envvar LOG_HOME\n");
+    return 1;
+  }
+
+  char *editor = getenv("EDITOR");
+  if (editor == NULL) {
+    editor = "vim";
+  }
+
+  time_t timeNow = time(0);
+  struct tm *timeLocal = localtime(&timeNow);
+
+  char *yearPath;
+  int b = asprintf(&yearPath, "%s/%d", path, timeLocal->tm_year + 1900);
+  if (b == -1) {
+    return 1;
+  }
+  int err = upsertDir(yearPath);
+  if (err != 0) {
+    printErr(err);
+    return 1;
+  }
+
+  char *monthPath;
+  b = asprintf(&monthPath, "%s/%d", yearPath, timeLocal->tm_mon + 1);
+  if (b == -1) {
+    free(yearPath);
+    return 1;
+  }
+  err = upsertDir(monthPath);
+  if (err != 0) {
+    free(yearPath);
+    free(monthPath);
+    printErr(err);
+    return 1;
+  }
+
+
+  char *filePath;
+  b = asprintf(&filePath, "%s/%d.md", monthPath, timeLocal->tm_mday);
+  if (b == -1) {
+    free(yearPath);
+    free(monthPath);
+    return 1;
+  }
+  int fd = upsertFile(filePath);
+  if (fd == -1) {
+    free(yearPath);
+    free(monthPath);
+    free(filePath);
+    printErr(errno);
+    return 1;
+  }
+
+  free(yearPath);
+  free(monthPath);
+
+  dprintf(fd, "\n## %02d:%02d\n\n", timeLocal->tm_hour, timeLocal->tm_min);
+
+  close(fd);
+
+  char *command;
+  b = asprintf(&command, "%s + %s", editor, filePath);
+  if (b == -1) {
+    free(filePath);
+    return 1;
+  }
+
+  int status = system(command);
+  if (status == -1) {
+    free(filePath);
+    free(command);
+    printErr(errno);
+    return 1;
+  } else if (status != 0) {
+    free(filePath);
+    free(command);
+    printErr(status);
+    return status;
+  }
+
+  free(filePath);
+  free(command);
+
+  return 0;
+}
+
+int upsertDir(char *path) {
+  struct stat pathStat;
+  int err = stat(path, &pathStat);
+  if (err == -1) {
+    if (errno != ENOENT) {
+      return errno;
+    }
+
+    err = mkdir(path, 0775);
+    if (err == -1) {
+      return errno;
+    }
+  } else {
+    if (!S_ISDIR(pathStat.st_mode)) {
+      fprintf(stderr, "%s is not a directory\n", path);   
+      return ENOTDIR;
+    }
+  }
+
+  return 0;
+}
+
+// upsertFile makes sure a file exists.
+// Returns a file descriptor, or -1 on error.
+// errno will be populated?
+int upsertFile(char *path) {
+  int fd = open(path, O_CREAT|O_WRONLY|O_APPEND, 0775);
+  if (fd == -1) {
+    return -1;
+  }
+
+  return fd;
+}
+
+void printErr(int err) {
+  printf("err: %d %s\n", err, strerror(err));
+}
+
+
