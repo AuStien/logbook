@@ -1,6 +1,6 @@
 # Log
 
-A small C program to easily be able to log thoughts.
+A small C program to easily be able to log thoughts and stuff.
 
 Will follow the following file structure:
 ```
@@ -13,6 +13,7 @@ Will follow the following file structure:
 ```
 
 Will follow the following file structure, with headers being automatically generated:
+
 ```Markdown
 # Thursday 18. July 2024
 
