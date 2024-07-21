@@ -10,8 +10,10 @@
 #include <fcntl.h>
 
 int upsertDir(char *path);
-int upsertFile(char *path);
+int upsertFile(char *path, struct tm *time);
 void printErr(int err);
+
+const char *DAYS[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
 int main() {
   char *path = getenv("LOG_HOME");
@@ -60,7 +62,7 @@ int main() {
     return 1;
   }
 
-  int fd = upsertFile(filePath);
+  int fd = upsertFile(filePath, timeLocal);
   if (fd == -1) {
     free(filePath);
     printErr(errno);
@@ -114,12 +116,29 @@ int upsertDir(char *path) {
 }
 
 // upsertFile makes sure a file exists.
+// If it was created a header with DD/MM/YY
+// will be created.
 // Returns a file descriptor, or -1 on error.
 // errno will be populated?
-int upsertFile(char *path) {
+int upsertFile(char *path, struct tm *time) {
+  int wasCreated = 0;
+
+  struct stat pathStat;
+  int err = stat(path, &pathStat);
+  if (err == -1) {
+    if (errno != ENOENT) {
+      return errno;
+    }
+    wasCreated = 1;
+  }
+
   int fd = open(path, O_CREAT|O_WRONLY|O_APPEND, 0775);
   if (fd == -1) {
     return -1;
+  }
+
+  if (wasCreated == 1) {
+    dprintf(fd, "# %s %02d/%02d/%d\n", DAYS[time->tm_wday], time->tm_mday, time->tm_mon+1, time->tm_year % 100);
   }
 
   return fd;

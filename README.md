@@ -15,7 +15,7 @@ Will follow the following file structure:
 Will follow the following file structure, with headers being automatically generated:
 
 ```Markdown
-# Thursday 18. July 2024
+# Thu 18/07/24
 
 ## 10:43
 
