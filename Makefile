@@ -1,2 +1,5 @@
-main: main.c
-	gcc main.c -o main
+bin/main: main.c | bin
+	gcc main.c -o bin/main
+
+bin:
+	mkdir -p bin
