@@ -31,6 +31,20 @@ More thoughts
 
 Requires the `LOG_HOME` envvar which is the folder where the log files should be created.
 
+## Development
+
+Compile the code:
+
+```Bash
+make bin/log
+```
+
+Run the code:
+
+```Bash
+./bin/log
+```
+
 ## Future possibilites
 
 - Add tooling for grouping together notes
