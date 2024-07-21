@@ -41,37 +41,31 @@ int main() {
 
   char *monthPath;
   b = asprintf(&monthPath, "%s/%d", yearPath, timeLocal->tm_mon + 1);
+  free(yearPath);
   if (b == -1) {
-    free(yearPath);
     return 1;
   }
+
   err = upsertDir(monthPath);
   if (err != 0) {
-    free(yearPath);
     free(monthPath);
     printErr(err);
     return 1;
   }
 
-
   char *filePath;
   b = asprintf(&filePath, "%s/%d.md", monthPath, timeLocal->tm_mday);
+  free(monthPath);
   if (b == -1) {
-    free(yearPath);
-    free(monthPath);
     return 1;
   }
+
   int fd = upsertFile(filePath);
   if (fd == -1) {
-    free(yearPath);
-    free(monthPath);
     free(filePath);
     printErr(errno);
     return 1;
   }
-
-  free(yearPath);
-  free(monthPath);
 
   dprintf(fd, "\n## %02d:%02d\n\n", timeLocal->tm_hour, timeLocal->tm_min);
 
@@ -79,26 +73,20 @@ int main() {
 
   char *command;
   b = asprintf(&command, "%s + %s", editor, filePath);
+  free(filePath);
   if (b == -1) {
-    free(filePath);
     return 1;
   }
 
   int status = system(command);
+  free(command);
   if (status == -1) {
-    free(filePath);
-    free(command);
     printErr(errno);
     return 1;
   } else if (status != 0) {
-    free(filePath);
-    free(command);
     printErr(status);
     return status;
   }
-
-  free(filePath);
-  free(command);
 
   return 0;
 }
