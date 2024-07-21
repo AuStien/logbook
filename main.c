@@ -10,7 +10,7 @@
 #include <fcntl.h>
 
 int upsertDir(char *path);
-int upsertFile(char *path, struct tm *time);
+int upsertFile(char *path, char *newFileContent);
 void printErr(int err);
 
 const char *DAYS[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
@@ -65,7 +65,15 @@ int main() {
     return 1;
   }
 
-  int fd = upsertFile(filePath, timeLocal);
+  char *newFileContent;
+  b = asprintf(&newFileContent, "# %s %02d/%02d/%d\n", DAYS[timeLocal->tm_wday], timeLocal->tm_mday, timeLocal->tm_mon+1, timeLocal->tm_year % 100);
+  if (b == -1) {
+    fprintf(stderr, "asprintf for newFileContent failed\n");
+    return 1;
+  }
+
+  int fd = upsertFile(filePath, newFileContent);
+  free(newFileContent);
   if (fd == -1) {
     free(filePath);
     printErr(errno);
@@ -124,7 +132,7 @@ int upsertDir(char *path) {
 // will be created.
 // Returns a file descriptor, or -1 on error.
 // errno will be populated?
-int upsertFile(char *path, struct tm *time) {
+int upsertFile(char *path, char *newFileContent) {
   int wasCreated = 0;
 
   struct stat pathStat;
@@ -142,7 +150,7 @@ int upsertFile(char *path, struct tm *time) {
   }
 
   if (wasCreated == 1) {
-    dprintf(fd, "# %s %02d/%02d/%d\n", DAYS[time->tm_wday], time->tm_mday, time->tm_mon+1, time->tm_year % 100);
+    dprintf(fd, "%s", newFileContent);
   }
 
   return fd;
