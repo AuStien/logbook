@@ -16,9 +16,9 @@ void printErr(int err);
 const char *DAYS[] = {"Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"};
 
 int main() {
-  char *path = getenv("LOG_HOME");
+  char *path = getenv("LOGBOOK_HOME");
   if (path == NULL) {
-    fprintf(stderr, "missing envvar LOG_HOME\n");
+    fprintf(stderr, "missing envvar LOGBOOK_HOME\n");
     return 1;
   }
 

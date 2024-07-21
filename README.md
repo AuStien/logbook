@@ -29,7 +29,7 @@ More thoughts
 
 ## Setup
 
-Requires the `LOG_HOME` envvar which is the folder where the log files should be created.
+Requires the `LOGBOOK_HOME` envvar which is the folder where the log files should be created.
 
 ## Development
 
