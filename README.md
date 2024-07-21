@@ -1,4 +1,4 @@
-# Log
+# Logbook
 
 A small C program to easily be able to log thoughts and stuff.
 
