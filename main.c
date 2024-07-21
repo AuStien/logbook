@@ -33,6 +33,7 @@ int main() {
   char *yearPath;
   int b = asprintf(&yearPath, "%s/%d", path, timeLocal->tm_year + 1900);
   if (b == -1) {
+    fprintf(stderr, "asprintf for yearPath failed\n");
     return 1;
   }
   int err = upsertDir(yearPath);
@@ -45,6 +46,7 @@ int main() {
   b = asprintf(&monthPath, "%s/%d", yearPath, timeLocal->tm_mon + 1);
   free(yearPath);
   if (b == -1) {
+    fprintf(stderr, "asprintf for monthPath failed\n");
     return 1;
   }
 
@@ -59,6 +61,7 @@ int main() {
   b = asprintf(&filePath, "%s/%d.md", monthPath, timeLocal->tm_mday);
   free(monthPath);
   if (b == -1) {
+    fprintf(stderr, "asprintf for filePath failed\n");
     return 1;
   }
 
@@ -77,6 +80,7 @@ int main() {
   b = asprintf(&command, "%s + %s", editor, filePath);
   free(filePath);
   if (b == -1) {
+    fprintf(stderr, "asprintf for command failed\n");
     return 1;
   }
 
