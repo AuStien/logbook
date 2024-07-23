@@ -49,3 +49,4 @@ Run the code:
 
 - Add tooling for grouping together notes
 - Add possiblity of storing files remotely using `sftp`
+- Consider using CMake
