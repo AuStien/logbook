@@ -3,6 +3,7 @@
 A small C program to easily be able to log thoughts and stuff.
 
 Will follow the following file structure:
+
 ```
 2024/
   01/
@@ -23,8 +24,7 @@ Some thoughts written down.
 
 ## 12:01
 
-More thoughts
-
+More thoughts.
 ```
 
 ## Setup
