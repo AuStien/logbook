@@ -48,5 +48,5 @@ Run the code:
 ## Future possibilites
 
 - Add tooling for grouping together notes
-- Add possiblity of storing files remotely using `sftp`
+- Add possiblity of storing files remotely using `sftp` and/or FUSE
 - Consider using CMake
