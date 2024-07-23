@@ -48,4 +48,4 @@ Run the code:
 ## Future possibilites
 
 - Add tooling for grouping together notes
-- Add possiblity of storing files remotely using `scp`
+- Add possiblity of storing files remotely using `sftp`
