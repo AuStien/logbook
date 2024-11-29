@@ -1,4 +1,4 @@
-package cmd
+package binder
 
 import (
 	"fmt"
@@ -15,7 +15,7 @@ var editCmd = &cobra.Command{
 	Short: "Edit the any file, creating directories if necessary",
 	Args:  cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
-		b := binder.New(rootDir, editor)
+		b := binder.New(cmd.RootDir, cmd.Editor)
 
 		levels := strings.Split(args[0], string(os.PathSeparator))
 		if len(levels) > 1 {

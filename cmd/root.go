@@ -13,37 +13,37 @@ import (
 )
 
 var (
-	editor  editors.Editor
-	rootDir string
+	Editor  editors.Editor
+	RootDir string
 )
 
 func init() {
-	rootCmd.PersistentFlags().String("home", "$HOME/.logbook", "home for logs (default is $HOME/.logbook)")
-	rootCmd.PersistentFlags().String("editor", "vi", "which editor to use (default is vi")
+	RootCmd.PersistentFlags().String("home", "$HOME/.logbook", "home for logs (default is $HOME/.logbook)")
+	RootCmd.PersistentFlags().String("editor", "vi", "which editor to use (default is vi")
 
 	viper.SetEnvPrefix("LOGBOOK")
-	viper.BindPFlag("home", rootCmd.LocalFlags().Lookup("home"))
+	viper.BindPFlag("home", RootCmd.LocalFlags().Lookup("home"))
 	viper.BindEnv("home")
-	viper.BindPFlag("editor", rootCmd.LocalFlags().Lookup("editor"))
+	viper.BindPFlag("editor", RootCmd.LocalFlags().Lookup("editor"))
 	viper.BindEnv("editor", "EDITOR")
 
-	rootCmd.AddCommand(todoCmd)
-	rootCmd.AddCommand(viewCmd)
-	rootCmd.AddCommand(editCmd)
+	RootCmd.AddCommand(todoCmd)
+	RootCmd.AddCommand(viewCmd)
+	RootCmd.AddCommand(editCmd)
 }
 
-var rootCmd = &cobra.Command{
+var RootCmd = &cobra.Command{
 	Use:   "log",
 	Short: "Jot jot",
 	PersistentPreRun: func(cmd *cobra.Command, args []string) {
 		var err error
-		editor, err = editors.GetEditor(viper.GetString("editor"))
+		Editor, err = editors.GetEditor(viper.GetString("editor"))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed getting editor setup for %s: %s\n", viper.GetString("editor"), err.Error())
 			os.Exit(1)
 		}
 
-		rootDir, err = filepath.Abs(viper.GetString("home"))
+		RootDir, err = filepath.Abs(viper.GetString("home"))
 		if err != nil {
 			fmt.Fprintf(os.Stderr, "failed getting absolute path for %s: %s\n", viper.GetString("home"), err.Error())
 			os.Exit(1)
@@ -52,7 +52,7 @@ var rootCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		now := time.Now()
 
-		j := journal.New(rootDir, editor)
+		j := journal.New(RootDir, Editor)
 
 		if err := j.CreateEntry(now); err != nil {
 			fmt.Fprintf(os.Stderr, "upserDayFile: %s\n", err.Error())
@@ -64,7 +64,7 @@ var rootCmd = &cobra.Command{
 func Execute() error {
 	if len(os.Args[1:]) == 1 {
 		var cmdFound bool
-		cmds := rootCmd.Commands()
+		cmds := RootCmd.Commands()
 
 		for _, cmd := range cmds {
 			if cmd.Name() == os.Args[1] {
@@ -74,9 +74,9 @@ func Execute() error {
 		}
 		if !cmdFound {
 			args := append([]string{"edit"}, os.Args[1])
-			rootCmd.SetArgs(args)
+			RootCmd.SetArgs(args)
 		}
 	}
 
-	return rootCmd.Execute()
+	return RootCmd.Execute()
 }
